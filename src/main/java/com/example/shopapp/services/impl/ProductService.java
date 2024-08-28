@@ -10,6 +10,7 @@ import com.example.shopapp.model.ProductImage;
 import com.example.shopapp.repositories.CategoryRepository;
 import com.example.shopapp.repositories.ProductImageRepository;
 import com.example.shopapp.repositories.ProductRepository;
+import com.example.shopapp.responses.ProductResponse;
 import com.example.shopapp.services.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,9 +47,20 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
+    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
         // Lấy danh sách sản phẩm theo trang(page) và giới hạn(limit)
-        return productRepository.findAll(pageRequest);
+        return productRepository.findAll(pageRequest).map(product -> {ProductResponse productResponse = ProductResponse.builder()
+                .name(product.getName())
+                .price(product.getPrice())
+                .thumbnail(product.getThumbnail())
+                .description(product.getDescription())
+                .categoryId(product.getCategory().getId())
+                .build();
+            productResponse.setCreatedAt(product.getCreatedAt());
+            productResponse.setUpdatedAt(product.getUpdatedAt());
+            return productResponse;
+
+        });
     }
 
     @Override
@@ -90,7 +102,7 @@ public class ProductService implements IProductService {
             Long productId,
             ProductImageDto productImageDto) throws DataNotFoundException, InvalidParamException {
 
-        Product existingProduct = productRepository.findById(productImageDto.getProductId())
+        Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new DataNotFoundException(
                         "Can not find product with id :" + productImageDto.getProductId()));
         ProductImage newProductImage = ProductImage
@@ -100,8 +112,8 @@ public class ProductService implements IProductService {
                 .build();
         // không insert quá 5 ảnh cho 1 sản phẩm
         int size = productImageRepository.findByProductId(existingProduct.getId()).size();
-        if (size >= 5) {
-            throw new InvalidParamException("Number of images must be less than 5");
+        if (size >= ProductImage.MAXIMUM_IMAGES_PER_PRODUCT) {
+            throw new InvalidParamException("Number of images must be less than "+ProductImage.MAXIMUM_IMAGES_PER_PRODUCT)  ;
         }
         return productImageRepository.save(newProductImage);
     }
