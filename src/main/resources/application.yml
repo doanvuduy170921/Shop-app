@@ -21,4 +21,9 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
 api:
   prefix: api/v1
+jwt:
+  expiration: 2952000
+  secretKey: I have a dream
+  #30 days
+
 

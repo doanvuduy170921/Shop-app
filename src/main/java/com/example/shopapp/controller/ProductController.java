@@ -103,7 +103,15 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getProduct(@PathVariable("id") Long productId) {
+        try {
+            Product existingProduct = productService.getProductById(productId);
+            return ResponseEntity.ok(ProductResponse.fromproduct(existingProduct));
+        } catch (Exception e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @GetMapping("")
     public ResponseEntity<ProductListResponse> getAllProducts(
@@ -123,12 +131,26 @@ public class ProductController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatedProduct(@PathVariable Long id){
-        return ResponseEntity.ok().body("Test updated Product.........");
+    public ResponseEntity<?> updatedProduct(
+            @PathVariable Long id,
+            @RequestBody ProductDto productDto){
+        try {
+            Product updatedProduct = productService.updateProduct(id,productDto);
+            return ResponseEntity.ok(updatedProduct);
+        } catch (Exception e) {
+           return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletedProduct(@PathVariable Long id){
-        return ResponseEntity.ok().body("Test deleted Product.........");
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok(String.format("Deleted product with ID : %d", id));
+        }catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
     private String storeFile(MultipartFile file) throws IOException {
         if(!isImageFile(file) || file.getOriginalFilename() == null){
@@ -154,8 +176,8 @@ public class ProductController {
         String contentType = file.getContentType();
         return contentType != null && contentType.startsWith("image/");
     }
-    @PostMapping("/generateFakerProducts")
-    public ResponseEntity<?> generateFakerProducts(){
+   // @PostMapping("/generateFakerProducts")
+    private ResponseEntity<?> generateFakerProducts(){
         Faker faker = new Faker();
         for(int i =0;i < 1000;i++){
             String productName = faker.commerce().productName();
@@ -167,13 +189,14 @@ public class ProductController {
                     .name(productName)
                     .price((float)faker.number().numberBetween(10,10000))
                     .description(faker.lorem().sentence())
-                    .categoryId((long)faker.number().numberBetween(1,3))
+                    .thumbnail("")
+                    .categoryId((long)faker.number().numberBetween(2,5))
                     .build();
             try {
                 productService.createProduct(productDto);
             } catch (Exception e) {
                return ResponseEntity.badRequest().body(e.getMessage());
-            }
+                }
         }
         return ResponseEntity.ok().build();
     }

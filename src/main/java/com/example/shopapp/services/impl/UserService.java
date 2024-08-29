@@ -1,5 +1,6 @@
 package com.example.shopapp.services.impl;
 
+import com.example.shopapp.components.JwtTokenUtil;
 import com.example.shopapp.dtos.UserDto;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.model.Role;
@@ -9,13 +10,22 @@ import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.services.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private  UserRepository userRepository;
-    private  RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AuthenticationManager authenticationManager;
 
     @Override
     public User createUser(UserDto userDto) throws DataNotFoundException {
@@ -40,13 +50,32 @@ public class UserService implements IUserService {
         newUser.setRole(role);
         // Kiểm tra nếu có account Id , không yêu cầu password
         if(userDto.getFacebookAccountId() ==0 && userDto.getGoogleAccountId() == 0){
-            //làm trong phần security
+
+            String password = userDto.getPassword();
+            String encoderPassword = passwordEncoder.encode(password);
+            newUser.setPassword(encoderPassword);
         }
         return userRepository.save(newUser);
     }
 
     @Override
-    public String login(String phoneNumber, String password) {
-        return "";
+    public String login(String phoneNumber, String password) throws Exception{
+        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        if(optionalUser.isEmpty()){
+            throw new DataNotFoundException("Invalid phone number or password");
+        }
+        User existingUser = optionalUser.get();
+        //check password
+        if(existingUser.getFacebookAccountId()==0 && existingUser.getGoogleAccountId()==0){
+            if(passwordEncoder.matches(optionalUser.get().getPassword(), existingUser.getPassword())){
+                throw  new BadCredentialsException("Phone number or password is wrong");
+            }
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                phoneNumber, password, existingUser.getAuthorities()
+        );
+        authenticationManager.authenticate(authenticationToken);
+        return jwtTokenUtil.generateToken(existingUser);
     }
 }
