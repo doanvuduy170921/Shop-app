@@ -14,7 +14,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-@Data
 @Getter
 @Setter
 @AllArgsConstructor
@@ -53,9 +52,11 @@ public class User  extends BaseEntity implements UserDetails {
     private Role role;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() { // lấy ra các quyền, thực chất là bảng Role
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorityList = new ArrayList<>();
-        authorityList.add(new SimpleGrantedAuthority("ROLE_"+getRole().getName()));
+        if (role != null) {
+            authorityList.add(new SimpleGrantedAuthority("ROLE_" + role.getName().toUpperCase()));
+        }
         return authorityList;
     }
 

@@ -26,8 +26,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         // UserDetailService : là kiểu interface --> kiểu trả về sẽ là 1 function
         return phoneNumber -> userRepository
-                .findByPhoneNumber(phoneNumber)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+                .findByPhoneNumber(phoneNumber);
     }
     // Khi người dùng đăng ký hoặc thay đổi mật khẩu,
     // mật khẩu sẽ được mã hóa bằng thuật toán BCrypt trước khi lưu vào cơ sở dữ liệu.

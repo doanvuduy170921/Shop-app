@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhoneNumber(String phoneNumber);
-    Optional<User> findByPhoneNumber(String phoneNumber); // --> kiểm tra xem kết quả trả về có null hay không ?
+    User findByPhoneNumber(String phoneNumber); // --> kiểm tra xem kết quả trả về có null hay không ?
 }

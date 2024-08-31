@@ -5,16 +5,18 @@ import lombok.*;
 
 @Entity
 @Table(name = "roles")
-@Data
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false,length = 50)// bắt buộc phải nhập
+    @Column(name = "name", nullable = false)
     private String name;
+
+    public static String ADMIN = "ADMIN";
+    public static String USER = "USER";
 }

@@ -60,14 +60,14 @@ public class UserService implements IUserService {
 
     @Override
     public String login(String phoneNumber, String password) throws Exception{
-        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
-        if(optionalUser.isEmpty()){
+        User optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        if(optionalUser ==null){
             throw new DataNotFoundException("Invalid phone number or password");
         }
-        User existingUser = optionalUser.get();
+        User existingUser = optionalUser;
         //check password
         if(existingUser.getFacebookAccountId()==0 && existingUser.getGoogleAccountId()==0){
-            if(passwordEncoder.matches(optionalUser.get().getPassword(), existingUser.getPassword())){
+            if(passwordEncoder.matches(optionalUser.getPassword(), existingUser.getPassword())){
                 throw  new BadCredentialsException("Phone number or password is wrong");
             }
         }

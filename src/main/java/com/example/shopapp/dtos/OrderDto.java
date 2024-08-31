@@ -9,8 +9,6 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 public class OrderDto {
 
     @JsonProperty("user_id")

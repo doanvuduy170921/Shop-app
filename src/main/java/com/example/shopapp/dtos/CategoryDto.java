@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 @Data //toString
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryDto {
