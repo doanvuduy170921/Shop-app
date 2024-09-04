@@ -5,6 +5,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -26,6 +29,7 @@ public class OrderDto {
     private String address;
 
     private String email;
+
     private  String note;
 
     @JsonProperty("total_money")
@@ -33,10 +37,14 @@ public class OrderDto {
     private Float totalMoney;
 
     @JsonProperty("shipping_method")
-    private Float shippingMethod;
+    private String shippingMethod;
+
     @JsonProperty("shipping_address")
-    private Float shippingAddress;
+    private String shippingAddress;
 
     @JsonProperty("payment_method")
-    private Float paymentMethod;
+    private String paymentMethod;
+
+    @JsonProperty("shipping_date")
+    private LocalDate shippingDate;
 }

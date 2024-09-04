@@ -3,6 +3,7 @@ package com.example.shopapp.configurations;
 import com.example.shopapp.model.User;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +25,7 @@ public class SecurityConfig {
 
     @Bean // khởi tạo đối tượng và inject vào
     public UserDetailsService userDetailsService() {
-        // UserDetailService : là kiểu interface --> kiểu trả về sẽ là 1 function
+        // UserDetailService : là kiểu interface
         return phoneNumber -> userRepository
                 .findByPhoneNumber(phoneNumber);
     }
@@ -45,5 +46,10 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return  config.getAuthenticationManager();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }

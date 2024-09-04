@@ -107,9 +107,9 @@ public class WebSecurityConfig {
 
 
                             .anyRequest().authenticated();
-                    //.anyRequest().permitAll();
 
                 })
+                
                 .csrf(AbstractHttpConfigurer::disable);
         http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {
             @Override
