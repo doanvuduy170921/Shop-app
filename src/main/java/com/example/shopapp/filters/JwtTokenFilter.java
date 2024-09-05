@@ -1,6 +1,6 @@
 package com.example.shopapp.filters;
 
-import com.example.shopapp.components.JwtTokenUtil;
+import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,12 +26,11 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-
 public class JwtTokenFilter extends OncePerRequestFilter{
     @Value("${api.prefix}")
     private String apiPrefix;
     private final UserDetailsService userDetailsService;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     @Override
     protected void doFilterInternal(@NonNull  HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -67,7 +66,6 @@ public class JwtTokenFilter extends OncePerRequestFilter{
         }catch (Exception e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
         }
-
     }
     private boolean isBypassToken(@NonNull  HttpServletRequest request) {
 

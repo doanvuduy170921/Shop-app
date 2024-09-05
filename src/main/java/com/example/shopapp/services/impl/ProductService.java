@@ -52,7 +52,7 @@ public class ProductService implements IProductService {
         // Lấy danh sách sản phẩm theo trang(page) và giới hạn(limit)
         return productRepository
                 .findAll(pageRequest)
-                .map(ProductResponse::fromproduct
+                .map(ProductResponse::fromProduct
         );
     }
 

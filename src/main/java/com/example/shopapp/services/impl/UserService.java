@@ -1,6 +1,6 @@
 package com.example.shopapp.services.impl;
 
-import com.example.shopapp.components.JwtTokenUtil;
+import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.dtos.UserDto;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.model.Role;
@@ -16,15 +16,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
 
     @Override

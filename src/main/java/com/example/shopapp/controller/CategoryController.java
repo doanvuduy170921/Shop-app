@@ -1,5 +1,6 @@
 package com.example.shopapp.controller;
 
+import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.dtos.CategoryDto;
 import com.example.shopapp.model.Category;
 import com.example.shopapp.services.impl.CategoryService;
@@ -19,6 +20,7 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("/")
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryDto categoryDto, BindingResult bindResult) {

@@ -1,9 +1,11 @@
 package com.example.shopapp.controller;
 
+import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.dtos.CategoryDto;
 import com.example.shopapp.dtos.OrderDetailDto;
 import com.example.shopapp.dtos.OrderDto;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -15,7 +17,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${api.prefix}/order_details")
+@RequiredArgsConstructor
 public class OrderDetailController {
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
     public ResponseEntity<?> create(@Valid @RequestBody OrderDetailDto orderDetailDto, BindingResult bindingResult) {

@@ -1,5 +1,6 @@
 package com.example.shopapp.controller;
 
+import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.dtos.ProductDto;
 import com.example.shopapp.dtos.ProductImageDto;
 import com.example.shopapp.model.Product;
@@ -37,6 +38,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductController {
     protected final IProductService productService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
     //POST http://localhost:8088/v1/api/products
