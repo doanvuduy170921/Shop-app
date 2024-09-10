@@ -1,19 +1,12 @@
 package com.example.shopapp.controller;
 
 import com.example.shopapp.components.LocalizationUtils;
-import com.example.shopapp.dtos.CategoryDto;
 import com.example.shopapp.dtos.OrderDetailDto;
-import com.example.shopapp.dtos.OrderDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("${api.prefix}/order_details")

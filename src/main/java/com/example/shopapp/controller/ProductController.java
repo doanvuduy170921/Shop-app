@@ -11,6 +11,7 @@ import com.example.shopapp.services.IProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -39,6 +41,25 @@ import java.util.UUID;
 public class ProductController {
     protected final IProductService productService;
     private final LocalizationUtils localizationUtils;
+
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
+        try {
+            Path iagePath = Paths.get("uploads/" + imageName);
+            UrlResource resource = new UrlResource(iagePath.toUri());
+            if(resource.exists()){
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            }else {
+                return ResponseEntity.notFound().build();
+            }
+        }catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
 
     @PostMapping("")
     //POST http://localhost:8088/v1/api/products
@@ -66,7 +87,7 @@ public class ProductController {
     //POST http://localhost:8088/v1/api/products
     public ResponseEntity<?> uploadImages(
             @PathVariable("id") Long productId,
-            @ModelAttribute("files") List<MultipartFile> files
+            @RequestParam("files") List<MultipartFile> files
     ){
         try {
             Product existingProduct = productService.getProductById(productId);
@@ -117,21 +138,26 @@ public class ProductController {
     }
 
     @GetMapping("")
-    public ResponseEntity<ProductListResponse> getAllProducts(
+    public ResponseEntity<ProductListResponse> getProducts(
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
-        PageRequest pageRequest = PageRequest.of(page, limit, Sort.by("createdAt").descending());
+        // Tạo pageable lấy thông tin từ trang và giới hạn
+        PageRequest pageRequest = PageRequest.of(
+                page, limit,
+                //Sort.by("createdAt").descending()
+                Sort.by("id").ascending()
+        );
         Page<ProductResponse> productPage = productService.getAllProducts(pageRequest);
         // Lấy tổng số trang
         int totalPages = productPage.getTotalPages();
         List<ProductResponse> products = productPage.getContent();
-        return ResponseEntity.ok(ProductListResponse.builder()
+        return ResponseEntity.ok(ProductListResponse
+                        .builder()
                         .products(products)
                         .totalPage(totalPages)
                 .build());
     }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updatedProduct(

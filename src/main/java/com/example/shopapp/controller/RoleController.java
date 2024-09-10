@@ -1,7 +1,7 @@
 package com.example.shopapp.controller;
 
 import com.example.shopapp.model.Role;
-import com.example.shopapp.repositories.RoleRepository;
+
 import com.example.shopapp.services.IRoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
