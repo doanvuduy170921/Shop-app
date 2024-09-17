@@ -6,8 +6,6 @@ import lombok.*;
 @Entity
 @Table(name = "social_account")
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

@@ -1,5 +1,6 @@
 package com.example.shopapp.controller;
 
+import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.dtos.ProductDto;
 import com.example.shopapp.dtos.ProductImageDto;
@@ -18,22 +19,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
@@ -41,11 +34,12 @@ import java.util.UUID;
 public class ProductController {
     protected final IProductService productService;
     private final LocalizationUtils localizationUtils;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @GetMapping("/images/{imageName}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
-            Path iagePath = Paths.get("uploads/" + imageName);
+            Path iagePath = Paths.get("D:/Project-BitiTraining/productfile/" + imageName);
             UrlResource resource = new UrlResource(iagePath.toUri());
             if(resource.exists()){
                 return ResponseEntity.ok()
@@ -58,8 +52,6 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
     @PostMapping("")
     //POST http://localhost:8088/v1/api/products
@@ -91,8 +83,9 @@ public class ProductController {
     ){
         try {
             Product existingProduct = productService.getProductById(productId);
-            files = files == null ? new ArrayList<MultipartFile>() : files;
-
+            if (files == null) {
+                files = new ArrayList<MultipartFile>();
+            }
             if(files.size() > ProductImage.MAXIMUM_IMAGES_PER_PRODUCT) {
                 return ResponseEntity.badRequest().body("You can only upload maximum 5 images");
             }
@@ -112,7 +105,7 @@ public class ProductController {
                             .body("File must be an image");
                 }
                 // Lưu file và cập nhật thumbnail trong DTO
-                String filename = storeFile(file); // Thay thế hàm này với code của bạn để lưu file
+                String filename = jwtTokenUtils.storeFile(file); // Thay thế hàm này với code của bạn để lưu file
                 //lưu vào đối tượng product trong DB
                 ProductImage productImage = productService.createProductImage(
                         existingProduct.getId(),
@@ -181,30 +174,7 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    private String storeFile(MultipartFile file) throws IOException {
-        if(!isImageFile(file) || file.getOriginalFilename() == null){
-            throw new IOException("Invalid image format");
-        }
 
-        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        //Thêm UUID vào trước tên file để đảm bảo tên file là duy nhất
-        String uniqueFileName = UUID.randomUUID().toString()+"_"+fileName;
-        //Đường dẫn đến thư mục mà bạn muốn lưu file
-        java.nio.file.Path uploadDir = Paths.get("uploads");
-        //Kiểm tra và tạo thư mục nếu nó không tồn tại
-        if(!Files.exists(uploadDir)){
-            Files.createDirectories(uploadDir);
-        }
-        // Đường dẫn đầy đủ đến tên file
-        java.nio.file.Path destination = Paths.get(uploadDir.toString(),uniqueFileName);
-        // Sao chép file vào thư mục chính
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        return uniqueFileName;
-    }
-    private boolean isImageFile(MultipartFile file) {
-        String contentType = file.getContentType();
-        return contentType != null && contentType.startsWith("image/");
-    }
    // @PostMapping("/generateFakerProducts")
     private ResponseEntity<?> generateFakerProducts(){
         Faker faker = new Faker();

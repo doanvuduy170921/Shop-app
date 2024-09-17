@@ -9,8 +9,6 @@ import java.util.Date;
 @Entity
 @Table(name = "products")
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

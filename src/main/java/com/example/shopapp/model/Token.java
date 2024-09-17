@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tokens")
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 

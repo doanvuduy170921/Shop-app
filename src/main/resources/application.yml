@@ -1,6 +1,7 @@
 server:
   port: 8088
-
+application:
+  uploadFile: /Project-BitiTraining/productfile
 spring:
   servlet:
     multipart:
