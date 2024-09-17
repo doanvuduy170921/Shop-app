@@ -13,13 +13,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByName(String title);
     Page<Product> findAll(Pageable pageable);
 
-    @Query(value = "SELECT * FROM products\n" +
-            "JOIN categories ON products.category_id = categories.id\n" +
-            "WHERE (:categoryId IS NULL OR categories.id =:categoryId)\n" +
-            "  AND (:keyword IS NULL OR  products.name like  %:keyword% or products.description like %:keyword%)",
-            countQuery = "SELECT count(*) FROM products\n" +
-                    "JOIN categories ON products.category_id = categories.id\n" +
-                    "WHERE (:categoryId IS NULL OR categories.id =:categoryId)\n" +
-                    "  AND (:keyword IS NULL OR  products.name like  %:keyword% or products.description like %:keyword%)",nativeQuery = true)
-    Page<Product> searchProducts(@Param("categoryId") Long categoryId,@Param("keyword") String keyword ,Pageable pageable);
+    @Query("SELECT p FROM Product p " +
+            "WHERE (:categoryId IS NULL OR :categoryId = 0 OR p.category.id = :categoryId) " +
+            "AND (:keyword IS NULL OR :keyword = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Product> searchProducts(@Param("categoryId") Long categoryId,
+                                 @Param("keyword") String keyword,
+                                 Pageable pageable);
+
 }

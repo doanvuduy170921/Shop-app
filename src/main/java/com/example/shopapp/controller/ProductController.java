@@ -130,8 +130,10 @@ public class ProductController {
         }
     }
 
-    @GetMapping("")
+    @GetMapping("/getAllProduct")
     public ResponseEntity<ProductListResponse> getProducts(
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0",name = "category_id") Long categoryId,
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
@@ -141,7 +143,7 @@ public class ProductController {
                 //Sort.by("createdAt").descending()
                 Sort.by("id").ascending()
         );
-        Page<ProductResponse> productPage = productService.getAllProducts(pageRequest);
+        Page<ProductResponse> productPage = productService.getAllProducts(keyword,categoryId,pageRequest);
         // Lấy tổng số trang
         int totalPages = productPage.getTotalPages();
         List<ProductResponse> products = productPage.getContent();

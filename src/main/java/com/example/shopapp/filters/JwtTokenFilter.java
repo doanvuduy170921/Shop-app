@@ -79,6 +79,10 @@ public class JwtTokenFilter extends OncePerRequestFilter{
         String path = request.getServletPath();
         String method = request.getMethod();
 
+        if (path.contains(String.format("%s/products/getAllProduct", apiPrefix)) && method.equals("GET")) {
+            return true;
+        }
+
         if (path.startsWith(String.format("%s/products", apiPrefix)) && method.equals("GET")) {
             return true;
         }

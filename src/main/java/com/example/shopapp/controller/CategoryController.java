@@ -42,8 +42,7 @@ public class CategoryController {
 
     @GetMapping("/get-all") //localhost:8088/api/v1/categories?page=1&limit=10
     public ResponseEntity<List<Category>> getAllCategories(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
+
     ) {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
