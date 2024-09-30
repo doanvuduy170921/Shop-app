@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -31,6 +32,7 @@ public class OrderService implements IOrderService {
         User user = userRepository.findById(orderDto.getUserId()).orElseThrow(
                 ()->new DataNotFoundException("User not found with id :"+orderDto.getUserId()));
         // convert OrderDto -> Order để thêm vào db
+
         // dùng thư viện Model Maper
         modelMapper.typeMap(OrderDto.class, Order.class)
                 .addMappings(mapper -> mapper.skip(Order::setId));
@@ -54,23 +56,38 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order updateOrder(Long id, OrderDto orderDto) {
-        return null;
+    public Order updateOrder(Long id, OrderDto orderDto) throws DataNotFoundException {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(()-> new DataNotFoundException("khong tim thay orderId"));
+        User user = userRepository.findById(orderDto.getUserId())
+                .orElseThrow(()-> new DataNotFoundException("khong tim thay orderId"));
+        modelMapper.typeMap(OrderDto.class, Order.class)
+                .addMappings(mapper -> mapper.skip(Order::setId));
+        // Cập nhật các trường của đơn hàng từ OrderDto
+        modelMapper.map(orderDto,order);
+        order.setUser(user);
+        return orderRepository.save(order);
     }
 
     @Override
     public List<Order> getAllOrder(Long userId) {
-        return List.of();
+        return orderRepository.findByUserId(userId);
+
     }
 
     @Override
-    public Order getOrder(OrderDto orderDto) {
-        return null;
+    public Order getOrder(Long id) throws DataNotFoundException {
+        return orderRepository.findById(id)
+                .orElseThrow(()-> new DataNotFoundException("khong tim thay id"));
     }
 
     @Override
-    public void deleteOrderById(Long id) {
-
+    public void deleteOrder(Long id) {
+       Order order = orderRepository.findById(id).orElse(null);
+        if(order!=null){
+            order.setActive(false);
+            orderRepository.save(order);
+        }
     }
 
 

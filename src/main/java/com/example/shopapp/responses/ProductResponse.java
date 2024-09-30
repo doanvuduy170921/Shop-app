@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ProductResponse extends BaseResponse {
-
+    private Long id;
     private String name;
     private Float price;
     private String thumbnail;
@@ -20,6 +20,7 @@ public class ProductResponse extends BaseResponse {
 
     public static ProductResponse fromProduct(Product product){
         ProductResponse productResponse = ProductResponse.builder()
+                .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .thumbnail(product.getThumbnail())

@@ -1,126 +1,80 @@
 package com.example.shopapp.configurations;
 
+
 import com.example.shopapp.filters.JwtTokenFilter;
-import com.example.shopapp.model.Role;
+import com.example.shopapp.services.impl.UserDetailServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-
-import java.util.Arrays;
-import java.util.List;
-
-import static org.springframework.http.HttpMethod.*;
 
 @Configuration
-//@EnableMethodSecurity
 @EnableWebSecurity
-@EnableWebMvc
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
     private final JwtTokenFilter jwtTokenFilter;
-    @Value("${api.prefix}")
-    private String apiPrefix;
+
     @Bean
-    //Pair.of(String.format("%s/products", apiPrefix), "GET"),
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception{
+    public UserDetailsService userDetailsService() {
+        return new UserDetailServiceImpl(); // Ensure UserInfoService implements UserDetailsService
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(requests -> {
-                    requests
-                            .requestMatchers(GET,
-                                    String.format("%s/products**", apiPrefix)).permitAll()
-                            .requestMatchers(GET,
-                                    String.format("%s/products/**", apiPrefix)).permitAll()
-                            .requestMatchers(GET,
-                                    String.format("%s/products/getAllProduct**", apiPrefix)).permitAll()
-                            .requestMatchers(GET,
-                                    String.format("%s/products/images/*", apiPrefix)).permitAll()
-                            .requestMatchers(POST,
-                                    String.format("%s/products/uploads/*", apiPrefix)).permitAll()
-                            .requestMatchers(POST,
-                                    String.format("%s/products/**", apiPrefix)).permitAll()
+                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for stateless APIs
+//                .cors(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/users/login","/api/v1/roles/**","/api/v1/products/images/**", "/api/v1/users/register").permitAll()
+                        .anyRequest().authenticated()
 
-                            .requestMatchers(PUT,
-                                    String.format("%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/products/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(
-                                    String.format("%s/users/register", apiPrefix),
-                                    String.format("%s/users/login", apiPrefix)
-                            )
-                            .permitAll()
-                            .requestMatchers(GET,
-                                        String.format("%s/roles**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/categories**", apiPrefix)).permitAll()
-
-                            .requestMatchers(GET,
-                                    String.format("%s/categories/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(POST,
-                                    String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/categories/**", apiPrefix)).hasAnyRole(Role.ADMIN)
-                            .requestMatchers(POST,
-                                    String.format("%s/orders/**", apiPrefix)).hasAnyRole(Role.USER)
-
-                            .requestMatchers(GET,
-                                    String.format("%s/orders/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(POST,
-                                    String.format("%s/order_details/**", apiPrefix)).hasAnyRole(Role.USER)
-
-                            .requestMatchers(GET,
-                                    String.format("%s/order_details/**", apiPrefix)).permitAll()
-
-                            .requestMatchers(PUT,
-                                    String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .requestMatchers(DELETE,
-                                    String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
-
-                            .anyRequest().authenticated();
-
-                })
-
-                .csrf(AbstractHttpConfigurer::disable);
-        http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {
-            @Override
-            public void customize(CorsConfigurer<HttpSecurity> httpSecurityCorsConfigurer) {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("*"));
-                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
-                configuration.setExposedHeaders(List.of("x-auth-token"));
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
-                httpSecurityCorsConfigurer.configurationSource(source);
-            }
-        });
+                        // Protect all other endpoints
+                )
+                .sessionManagement(sess -> sess
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No sessions
+                )
+                .authenticationProvider(authenticationProvider()) // Custom authentication provider
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Password encoding
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

@@ -42,9 +42,9 @@ public class OrderDto {
     @JsonProperty("shipping_address")
     private String shippingAddress;
 
-    @JsonProperty("payment_method")
-    private String paymentMethod;
-
     @JsonProperty("shipping_date")
     private LocalDate shippingDate;
+
+    @JsonProperty("payment_method")
+    private String paymentMethod;
 }

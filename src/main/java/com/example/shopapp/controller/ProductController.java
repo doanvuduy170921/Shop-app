@@ -4,14 +4,17 @@ import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.dtos.ProductDto;
 import com.example.shopapp.dtos.ProductImageDto;
+import com.example.shopapp.dtos.ProductImagesDto;
 import com.example.shopapp.model.Product;
 import com.example.shopapp.model.ProductImage;
+import com.example.shopapp.repositories.ProductImageRepository;
 import com.example.shopapp.responses.ProductListResponse;
 import com.example.shopapp.responses.ProductResponse;
 import com.example.shopapp.services.IProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,12 +34,16 @@ import java.util.List;
 @RestController
 @RequestMapping("${api.prefix}/products")
 @RequiredArgsConstructor
+@CrossOrigin("*")
+
 public class ProductController {
     protected final IProductService productService;
     private final LocalizationUtils localizationUtils;
     private final JwtTokenUtils jwtTokenUtils;
+    private final ProductImageRepository productImageRepository;
 
-    @GetMapping("/images/{imageName}")
+@ResponseBody
+    @RequestMapping(value = "/images/{imageName}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
             Path iagePath = Paths.get("D:/Project-BitiTraining/productfile/" + imageName);
@@ -53,10 +60,31 @@ public class ProductController {
         }
     }
 
-    @PostMapping("")
-    //POST http://localhost:8088/v1/api/products
+    @ResponseBody
+    @RequestMapping(value = "/list-image/{productId}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> listImages(@PathVariable Long productId) {
+    try {
+        List<String> images = productImageRepository.findAllByProductId(productId);
+        List<String> fullLinkImages;
+        if (images.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            fullLinkImages = new ArrayList<>();
+            for (String image : images) {
+                fullLinkImages.add("http://localhost:8088/api/v1/products/images/" + image);
+            }
+        }
+        return ResponseEntity.ok().body(fullLinkImages);
+    }catch (Exception e){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching images.");
+    }
+    }
+
+
+    @PostMapping("/add")
+    //POST http://localhost:8088/v1/api/products/image/251ef406-3cca-4ab6-8c10-cf45b738c2ec_3.jpg
     public ResponseEntity<?> createProduct(
-            @Valid @RequestBody ProductDto productDto,
+             @RequestBody ProductDto productDto,
             BindingResult result
     ) {
         try {
@@ -177,7 +205,7 @@ public class ProductController {
         }
     }
 
-   // @PostMapping("/generateFakerProducts")
+    @PostMapping("/generateFakerProducts")
     private ResponseEntity<?> generateFakerProducts(){
         Faker faker = new Faker();
         for(int i =0;i < 1000;i++){

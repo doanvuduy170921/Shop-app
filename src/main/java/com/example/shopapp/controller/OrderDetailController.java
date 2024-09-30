@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("${api.prefix}/order_details")
 @RequiredArgsConstructor
+@CrossOrigin("*")
+
 public class OrderDetailController {
     private final LocalizationUtils localizationUtils;
 

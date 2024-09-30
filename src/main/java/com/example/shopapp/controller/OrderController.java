@@ -16,6 +16,8 @@ import java.util.List;
 @RestController
 @RequestMapping("${api.prefix}/orders")
 @RequiredArgsConstructor
+@CrossOrigin("*")
+
 public class OrderController {
     private final IOrderService orderService;
     private final LocalizationUtils localizationUtils;
@@ -35,28 +37,49 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/{user_id}")
-    public ResponseEntity<?> getOrdersbyId(@PathVariable("user_id") Long user_id) {
+    @GetMapping("/users/{user_id}") // Thêm biến đường dẫn user_id
+    //GET http://localhost:8088/api/v1/orders/user/4
+    public ResponseEntity<?> getOrders(@Valid @PathVariable("user_id") Long userId) {
         try {
-
-            return ResponseEntity.ok().body("Lấy ra danh sách Order từ user_id");
+            List<Order> orders = orderService.getAllOrder(userId);
+            return ResponseEntity.ok().body(orders);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PutMapping("/{id}")
+    @GetMapping("/{id}") // Lấy order theo id của order
+    //GET http://localhost:8088/api/v1/orders/user/4
+    public ResponseEntity<?> getOrder(@Valid @PathVariable("id") Long orderId) {
+        try {
+            Order existingOrder = orderService.getOrder(orderId);
+            return ResponseEntity.ok().body(existingOrder);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
+
+    @PutMapping("/update/{id}")
     // Công việc của admin
     public ResponseEntity<?> updateOrder(
             @Valid @PathVariable Long id,
             @Valid @RequestBody OrderDto orderDto
     ){
-        return ResponseEntity.ok().body("updated order successfully");
+        try {
+            Order order = orderService.updateOrder(id, orderDto);
+            return ResponseEntity.ok().body(order);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     // Xóa mềm ==> cập nhật trường Active = false
     public ResponseEntity<?> deleteOrder(@PathVariable("id") Long id) {
+        orderService.deleteOrder(id);
         return ResponseEntity.ok().body("deleted order successfully");
     }
 }

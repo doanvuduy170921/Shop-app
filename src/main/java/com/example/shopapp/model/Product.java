@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -30,7 +32,8 @@ public class Product extends BaseEntity {
 
 
 
-    @JoinColumn(name = "category_id")
     @ManyToOne
     private Category category;
+
+
 }

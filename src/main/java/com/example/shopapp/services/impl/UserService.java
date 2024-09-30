@@ -2,6 +2,7 @@ package com.example.shopapp.services.impl;
 
 import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.dtos.UserDto;
+import com.example.shopapp.dtos.UserRes;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.model.Role;
 import com.example.shopapp.model.User;
@@ -13,6 +14,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,23 +60,21 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) throws Exception{
-        User optionalUser = userRepository.findByPhoneNumber(phoneNumber);
-        if(optionalUser ==null){
-            throw new DataNotFoundException("Invalid phone number or password");
-        }
-        User existingUser = optionalUser;
-        //check password
-        if(existingUser.getFacebookAccountId()==0 && existingUser.getGoogleAccountId()==0){
-            if(passwordEncoder.matches(optionalUser.getPassword(), existingUser.getPassword())){
-                throw  new BadCredentialsException("Phone number or password is wrong");
-            }
-        }
+    public UserRes login(String phoneNumber, String password) throws Exception{
+
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                phoneNumber, password, existingUser.getAuthorities()
+                phoneNumber,password
         );
-        authenticationManager.authenticate(authenticationToken);
-        return jwtTokenUtil.generateToken(existingUser);
+        Authentication authentication= null;
+        try {
+            authentication = authenticationManager.authenticate(authenticationToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        String token = this.jwtTokenUtil.generateToken(authentication.getName());
+
+        return new UserRes(token);
     }
 }

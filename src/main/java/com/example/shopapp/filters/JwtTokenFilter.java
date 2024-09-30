@@ -2,6 +2,7 @@ package com.example.shopapp.filters;
 
 import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.model.User;
+import com.example.shopapp.services.impl.UserDetailServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -29,70 +31,42 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter{
     @Value("${api.prefix}")
     private String apiPrefix;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailServiceImpl userDetailsService;
     private final JwtTokenUtils jwtTokenUtil;
+    public static  String CURRENT_USER= "";
+
+
     @Override
-    protected void doFilterInternal(@NonNull  HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain)
-            throws ServletException, IOException {
-        try {
-            if(isBypassToken(request)) {
-                filterChain.doFilter(request, response); //enable bypass
-                return;
-            }
-            final String authHeader = request.getHeader("Authorization");
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                return;
-            }
-            final String token = authHeader.substring(7);
-            final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
-            if (phoneNumber != null
-                    && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
-                if(jwtTokenUtil.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
-                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                }
-            }
-            filterChain.doFilter(request, response); //enable bypass
-        }catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-        }
-    }
-    private boolean isBypassToken(@NonNull  HttpServletRequest request) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Retrieve the Authorization header
+        String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String username = null;
 
-        final List<Pair<String, String>> bypassTokens = Arrays.asList(
-                Pair.of(String.format("%s/roles", apiPrefix), "GET"),
-                Pair.of(String.format("%s/products", apiPrefix), "GET"),
-                Pair.of(String.format("%s/categories", apiPrefix), "GET"),
-                Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
-                Pair.of(String.format("%s/users/login", apiPrefix), "POST")
-        );
-        String path = request.getServletPath();
-        String method = request.getMethod();
-
-        if (path.contains(String.format("%s/products/getAllProduct", apiPrefix)) && method.equals("GET")) {
-            return true;
+        // Check if the header starts with "Bearer "
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7); // Extract token
+            username = jwtTokenUtil.extractUsername(token); // Extract username from token
+            CURRENT_USER = username;
         }
 
-        if (path.startsWith(String.format("%s/products", apiPrefix)) && method.equals("GET")) {
-            return true;
-        }
+        // If the token is valid and no authentication is set in the context
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        for(Pair<String, String> bypassToken: bypassTokens) {
-            if (request.getServletPath().contains(bypassToken.getFirst()) &&
-                    request.getMethod().equals(bypassToken.getSecond())) {
-                return true;
+            // Validate token and set authentication
+            if (jwtTokenUtil.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        return false;
+
+        // Continue the filter chain
+        filterChain.doFilter(request, response);
     }
 }
