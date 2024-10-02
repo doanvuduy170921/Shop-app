@@ -1,0 +1,673 @@
+{
+	"info": {
+		"_postman_id": "3ba6a363-9816-4a3d-b51c-5afe6e84191f",
+		"name": "shop_app_biti",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "38226573",
+		"_collection_link": "https://biti99.postman.co/workspace/Biti-Workspace~f83be503-bf5e-4bec-8b13-1cfabcb95b4f/collection/35991578-3ba6a363-9816-4a3d-b51c-5afe6e84191f?action=share&source=collection_link&creator=38226573"
+	},
+	"item": [
+		{
+			"name": "category",
+			"item": [
+				{
+					"name": "{{API_PREFIX}}categories/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": "{{API_PREFIX}}categories/",
+						"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+					},
+					"response": []
+				},
+				{
+					"name": "Update data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful PUT request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Add your name in the body\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/info?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"info"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "This is a PUT request and it is used to overwrite an existing piece of data. For instance, after you create an entity with a POST request, you may want to modify that later. You can do that using a PUT request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful PUT request typically returns a `200 OK`, `201 Created`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful DELETE request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 202, 204]);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/info?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"info"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "This is a DELETE request, and it is used to delete data that was previously created via a POST request. You typically identify the entity being updated by including an identifier in the URL (eg. `id=1`).\n\nA successful DELETE request typically returns a `200 OK`, `202 Accepted`, or `204 No Content` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "{{API_PREFIX}}categories/",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"phụ kiện\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}categories/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "product",
+			"item": [
+				{
+					"name": "get info product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc3NjYwODQsImV4cCI6MTcyNzc2Nzg4NH0.Nq5PH6pLtcy2wghQAa-neG0nu3RKucJicD_YKGHRYEc"
+							}
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authen",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"url": "{{API_PREFIX}}products/5"
+					},
+					"response": []
+				},
+				{
+					"name": "upload images",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc2Nzc4OTIsImV4cCI6MTcyNzY3OTY5Mn0.NuGot38yAij3-zM3Vw39Fo0pb8-T7jI6NINo8DUpf4U"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": [
+										"/C:/Users/84384/Pictures/a (100).jpg",
+										"/C:/Users/84384/Pictures/a (101).jpg",
+										"/C:/Users/84384/Pictures/a (102).jpg"
+									]
+								}
+							]
+						},
+						"url": "{{API_PREFIX}}products/uploads/38"
+					},
+					"response": []
+				},
+				{
+					"name": "faker data",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc2NjkyOTUsImV4cCI6MTcyNzY3MTA5NX0.qj3J9a9n3ZsijzT-RcmnPvaNYOvrWLPkfHMRDOFL4PA"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"url": "{{API_PREFIX}}products/generateFakerProducts"
+					},
+					"response": []
+				},
+				{
+					"name": "get product with search",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc0MjU1MjIsImV4cCI6MTcyNzQyNzMyMn0.8L0Tz07z4n7gwGmf9UhFfLt4uSxnAd0MkghIXBgV_H8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_PREFIX}}products/getAllProduct?keyword=Fantastic&page=1&limit=12&category_id=3",
+							"host": [
+								"{{API_PREFIX}}products"
+							],
+							"path": [
+								"getAllProduct"
+							],
+							"query": [
+								{
+									"key": "keyword",
+									"value": "Fantastic"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "12"
+								},
+								{
+									"key": "category_id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get image by name of image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc0MjU1MjIsImV4cCI6MTcyNzQyNzMyMn0.8L0Tz07z4n7gwGmf9UhFfLt4uSxnAd0MkghIXBgV_H8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX}}products/images/6bd8fe87-1e94-490f-aa49-e91a544b040e_1.jpg"
+					},
+					"response": []
+				},
+				{
+					"name": "add product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc0MjU1MjIsImV4cCI6MTcyNzQyNzMyMn0.8L0Tz07z4n7gwGmf9UhFfLt4uSxnAd0MkghIXBgV_H8"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"asdfg\",\r\n    \"price\":1123012,\r\n    \"description\":\"123123\",\r\n    \"thumbnail\":\"123321\",\r\n    \"category_id\":2\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}products/add"
+					},
+					"response": []
+				},
+				{
+					"name": "get-image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc3NTM4NzEsImV4cCI6MTcyNzc1NTY3MX0.yveSHk_6jW1z1WjstPaqMTntJKBFflc7CzFFn_JUNDM"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "http://localhost:8088/api/v1/products/images/28b12fea-77a6-4dfd-ad71-1236e5ae2d55_2.jpg"
+					},
+					"response": []
+				},
+				{
+					"name": "get-list-image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc3NTM4NzEsImV4cCI6MTcyNzc1NTY3MX0.yveSHk_6jW1z1WjstPaqMTntJKBFflc7CzFFn_JUNDM"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX}}products/list-image/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order",
+			"item": [
+				{
+					"name": "get order by order id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/orders/{{order_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "get all order by user id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc0MjU1MjIsImV4cCI6MTcyNzQyNzMyMn0.8L0Tz07z4n7gwGmf9UhFfLt4uSxnAd0MkghIXBgV_H8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}orders/users/1"
+					},
+					"response": []
+				},
+				{
+					"name": "add order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc2Nzk3NjYsImV4cCI6MTcyNzY4MTU2Nn0.2gpBGOxXSNlHdRk4avv1vaNRsI8r4TYYb8qq0sxGSKY"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\":3,\r\n    \"fullname\":\"nguyen van b\",\r\n    \"phone_number\":\"123456789\",\r\n    \"address\":\"Hai Chau\",\r\n    \"email\":\"nguyenvanb@gmail.com\",\r\n    \"notes\":\"test\",\r\n    \"total_money\":1000,\r\n    \"shipping_method\":\"shipingppppp\",\r\n    \"shipping_addres\":\"Hai Chau\",\r\n    \"payment_method\":\"Xe may\",\r\n    \"shipping_date\":\"2024-09-30\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}orders"
+					},
+					"response": []
+				},
+				{
+					"name": "update order by id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc0MjU1MjIsImV4cCI6MTcyNzQyNzMyMn0.8L0Tz07z4n7gwGmf9UhFfLt4uSxnAd0MkghIXBgV_H8"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\" : 1,\r\n    \"fullname\":\"test test\",\r\n    \"phone_number\":\"12ddftyguh3456\",\r\n    \"address\":\"2345\",\r\n    \"email\":\"werty\",\r\n    \"note\":\"werty\",\r\n    \"total_money\":10000,\r\n    \"shipping_method\":\"3erty\",\r\n    \"shipping_address\":\"4r\",\r\n    \"shipping_date\":\"2024-09-30\",\r\n    \"payment_method\":\"123e4rty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}orders/update/1"
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc0OTIwMjEsImV4cCI6MTcyNzQ5MzgyMX0.561fWfmdZLz0PK8B41nSwwrm2j-jHiz0BvcJF9WdwNw"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"orderId\": 0,\r\n    \"user\": {\r\n        \"id\": 1\r\n    },\r\n    \"fullname\": \"Anh Khoa\",\r\n    \"phoneNumber\": \"0123456789\",\r\n    \"address\": \"Đà Nẵng\",\r\n    \"email\": \"anhkhoa@gmail.com\",\r\n    \"note\": \"Hàng dễ vỡ\",\r\n    \"orderDate\": \"2024-09-05T16:07:41\",\r\n    \"status\": \"Ok\",\r\n    \"shipping_method\": \"COD\",\r\n    \"shipping_address\": \"Đà Nẵng\",\r\n    \"trackingNumber\": \"FE0126123265\",\r\n    \"payment_method\": \"COD\",\r\n    \"shippingDate\": \"2024-09-05T16:07:41\",\r\n    \"active\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}orders/delete/9"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order detail",
+			"item": [
+				{
+					"name": "create order detail",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"orderDetailId\": 5,\r\n    \"order\": {\r\n        \"id\": 12\r\n    },\r\n    \"product\": {\r\n        \"id\": 10\r\n    },\r\n    \"price\": 12000,\r\n    \"numberOfProduct\": 5,\r\n    \"totalMoney\": 10000,\r\n    \"color\": \"Xanh\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}order_details/"
+					},
+					"response": []
+				},
+				{
+					"name": "get all order detail by order id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX}}order_details/order/{{order_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "delete order detail by order detail id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{API_PREFIX}}order_details/{{order_detail_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "update order detail",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"orderDetailId\": 5,\r\n    \"numberOfProduct\": 15,\r\n    \"color\": \"Đỏ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}order_details/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "register user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullname\":\"Nguyen Van abv\",\r\n    \"phone_number\":123321,\r\n    \"address\":\"Hai Chau\",\r\n    \"password\":\"123\",\r\n    \"retype_password\":\"123\",\r\n    \"date_of_birth\":\"2001-09-17\",\r\n    \"facebook_account_id\":0,\r\n    \"google_account_id\":0,\r\n    \"role_id\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}users/register"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "vi",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"phoneNumber\":\"123456789\",\r\n    \"password\":\"123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}users/login"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "roles",
+			"item": [
+				{
+					"name": "get roles",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc4NTI1MTAsImV4cCI6MTcyNzg1NDMxMH0.CBkNqsPFgqYy2UQbgC7PbiX1K7md_qZ9CRzPXDnM0O8"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{API_PREFIX}}roles"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "cart",
+			"item": [
+				{
+					"name": "add-to-cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc3NjYwODQsImV4cCI6MTcyNzc2Nzg4NH0.Nq5PH6pLtcy2wghQAa-neG0nu3RKucJicD_YKGHRYEc"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"productId\":6,\r\n    \"quantity\":1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}carts/add-to-cart"
+					},
+					"response": []
+				},
+				{
+					"name": "list-cart",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkiLCJpYXQiOjE3Mjc3NTU5MzIsImV4cCI6MTcyNzc1NzczMn0.nEEvJJ2Hhb_5kOl0z4rqTHPyXDC70QRZZLRoydvBa38"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API_PREFIX}}carts/user-cart"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "http://localhost:8088/api/v1"
+		},
+		{
+			"key": "user_id",
+			"value": "1"
+		},
+		{
+			"key": "order_id",
+			"value": "13"
+		},
+		{
+			"key": "order_detail_id",
+			"value": "1"
+		}
+	]
+}
