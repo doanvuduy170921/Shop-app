@@ -205,7 +205,7 @@ public class ProductController {
         }
     }
 
-    @PostMapping("/generateFakerProducts")
+    /*@PostMapping("/generateFakerProducts")
     private ResponseEntity<?> generateFakerProducts(){
         Faker faker = new Faker();
         for(int i =0;i < 1000;i++){
@@ -216,7 +216,7 @@ public class ProductController {
 
             ProductDto productDto = ProductDto.builder()
                     .name(productName)
-                    .price((float)faker.number().numberBetween(10,10000))
+                    .price(faker.number().numberBetween(10,10000))
                     .description(faker.lorem().sentence())
                     .thumbnail("")
                     .categoryId((long)faker.number().numberBetween(2,5))
@@ -228,7 +228,7 @@ public class ProductController {
                 }
         }
         return ResponseEntity.ok().build();
-    }
+    }*/
 
 }
 

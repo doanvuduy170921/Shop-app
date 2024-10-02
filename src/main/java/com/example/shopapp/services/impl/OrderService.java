@@ -5,6 +5,7 @@ import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.model.Order;
 import com.example.shopapp.model.OrderStatus;
 import com.example.shopapp.model.User;
+import com.example.shopapp.repositories.CartRepository;
 import com.example.shopapp.repositories.OrderRepository;
 import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.services.IOrderService;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
 
 
 @Service
@@ -24,6 +25,7 @@ import java.util.Optional;
 public class OrderService implements IOrderService {
     private  final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -89,6 +91,5 @@ public class OrderService implements IOrderService {
             orderRepository.save(order);
         }
     }
-
 
 }

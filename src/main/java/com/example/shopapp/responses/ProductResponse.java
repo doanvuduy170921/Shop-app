@@ -11,7 +11,7 @@ import lombok.*;
 public class ProductResponse extends BaseResponse {
     private Long id;
     private String name;
-    private Float price;
+    private int price;
     private String thumbnail;
     private String description;
 

@@ -1,7 +1,10 @@
 package com.example.shopapp.services;
 
 import com.example.shopapp.model.Cart;
+import com.example.shopapp.responses.CartResponseDto;
 
 public interface ICartService {
-    Cart addToCart(Cart cart ,Long productId);
+    CartResponseDto addToCart(Cart cart , Long productId);
+
+
 }

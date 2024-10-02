@@ -18,7 +18,7 @@ public class ProductDto {
 
     @Min(value = 0,message = "Price must be greater or equals to 0")
     @Max(value = 10000000,message = "Price must be less than to 10000000")
-    private Float price;
+    private int price;
     private String thumbnail;
     private String description;
 
