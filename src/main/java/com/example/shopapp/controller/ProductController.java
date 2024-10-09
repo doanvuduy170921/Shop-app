@@ -11,6 +11,7 @@ import com.example.shopapp.repositories.ProductImageRepository;
 import com.example.shopapp.responses.ProductListResponse;
 import com.example.shopapp.responses.ProductResponse;
 import com.example.shopapp.services.IProductService;
+import com.example.shopapp.services.impl.ProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class ProductController {
     private final LocalizationUtils localizationUtils;
     private final JwtTokenUtils jwtTokenUtils;
     private final ProductImageRepository productImageRepository;
+    private  final ProductService productServiceImpl;
 
 @ResponseBody
     @RequestMapping(value = "/images/{imageName}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -229,6 +231,14 @@ public class ProductController {
         }
         return ResponseEntity.ok().build();
     }*/
+    @GetMapping("/search-by-criteria")
+    public List<Product> searchByCriteria(
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) String name){
 
+        return productService.searchProductByCriteria(categoryName,minPrice,maxPrice,name);
+    }
 }
 

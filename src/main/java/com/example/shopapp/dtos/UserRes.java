@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class UserRes {
 
     private String token;
+    private UserDto user;
 }

@@ -25,15 +25,10 @@ public class OrderDetail {
     @Column(name = "price")
     private Float price;
 
-    @Column(name = "number_of_product")
-    private  int numberOfProduct;
+    @Column(name = "quantity")
+    private  int quantity;
 
     @Column(name = "total_money")
     private Float totalMoney;
-
-    @Column(name = "color")
-    private String color;
-
-
 
 }

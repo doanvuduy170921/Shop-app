@@ -24,14 +24,17 @@ public class User  extends BaseEntity implements UserDetails {
     @Column(name = "fullname", nullable = false,length = 100)
     private String fullName;
 
-    @Column(name = "phone_number", nullable = false,length = 10)
+    @Column(name = "phone_number", nullable = true,length = 10)
     private String phoneNumber;
 
     @Column(name = "address",length = 200)
     private String address;
 
-    @Column(name = "password", nullable = false,length = 100)
+    @Column(name ="email")
+    private String email;
+
     private String password;
+
 
     @Column(name = "is_active")
     private boolean isActive;

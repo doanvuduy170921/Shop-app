@@ -10,6 +10,7 @@ import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.services.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,7 +28,7 @@ public class UserService implements IUserService {
     private final RoleRepository roleRepository;
     private final JwtTokenUtils jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
-
+    private final ModelMapper modelMapper;
     @Override
     public User createUser(UserDto userDto) throws DataNotFoundException {
         String phoneNumber = userDto.getPhoneNumber();
@@ -74,7 +75,7 @@ public class UserService implements IUserService {
             e.printStackTrace();
         }
         String token = this.jwtTokenUtil.generateToken(authentication.getName());
-
-        return new UserRes(token);
+        User user = userRepository.findByPhoneNumber(authentication.getName()).get();
+        return new UserRes(token,modelMapper.map(user, UserDto.class));
     }
 }

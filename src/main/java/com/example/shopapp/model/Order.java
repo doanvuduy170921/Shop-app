@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -12,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Order {
+public class Order{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,26 +22,14 @@ public class Order {
     @ManyToOne
     private User user;
 
-    @Column(name = "fullname",length = 100)
-    private String fullName;
-
-    @Column(name = "email",length = 100)
-    private String email;
-
-    @Column(name = "phone_number",nullable = false,length = 20)
-    private String phoneNumber;
-
-    @Column(name = "address")
-    private String address;
-
-    @Column(name = "note")
-    private String note;
-
     @Column(name = "order_date")
     private Date orderDate;
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "order_code")
+    private String orderCode;
 
     @Column(name = "total_money")
     private Float totalMoney;
@@ -61,6 +51,9 @@ public class Order {
 
     @Column(name = "active")
     private Boolean active;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderDetail> orderDetails = new ArrayList<>();
 
 
 }

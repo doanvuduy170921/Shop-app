@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class CartResponseDto {
+    private  Long id;
 
     private String thumbnail;
 
@@ -18,4 +19,5 @@ public class CartResponseDto {
     private int quantity;
 
     private int price;
+    private UserRes user;
 }

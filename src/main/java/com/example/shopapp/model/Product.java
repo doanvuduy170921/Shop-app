@@ -31,9 +31,6 @@ public class Product extends BaseEntity {
     private String description;
 
 
-
     @ManyToOne
     private Category category;
-
-
 }

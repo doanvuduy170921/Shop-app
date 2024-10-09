@@ -6,6 +6,7 @@ import com.example.shopapp.repositories.OrderDetailRepository;
 import com.example.shopapp.services.IOrderDetailService;
 import com.example.shopapp.services.IOrderService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 public class OrderDetailService implements IOrderDetailService {
 
     private final OrderDetailRepository orderDetailRepository;
+    private final ModelMapper modelMapper;
 
     @Override
     public OrderDetail createDetail(OrderDetailDto newOrderDetail) {
@@ -24,6 +26,8 @@ public class OrderDetailService implements IOrderDetailService {
 
     @Override
     public OrderDetail getDetailById(Long id) {
+        OrderDetail orderDetail = orderDetailRepository.findById(id).orElse(null);
+
         return null;
     }
 
@@ -39,6 +43,6 @@ public class OrderDetailService implements IOrderDetailService {
 
     @Override
     public void deleteDetail(Long id) {
-
     }
+
 }

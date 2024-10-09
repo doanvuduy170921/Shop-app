@@ -1,5 +1,6 @@
 package com.example.shopapp.services.impl;
 
+import com.example.shopapp.dtos.UserDto;
 import com.example.shopapp.filters.JwtTokenFilter;
 import com.example.shopapp.model.Cart;
 import com.example.shopapp.model.Product;
@@ -8,8 +9,12 @@ import com.example.shopapp.repositories.CartRepository;
 import com.example.shopapp.repositories.ProductRepository;
 import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.responses.CartResponseDto;
+import com.example.shopapp.responses.UserRes;
 import com.example.shopapp.services.ICartService;
+import com.example.shopapp.specification.CartSpecification;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +26,7 @@ public class CartService implements ICartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private  final ModelMapper modelMapper;
 
     @Override
     public CartResponseDto addToCart(Cart cart, Long productId) {
@@ -30,7 +36,6 @@ public class CartService implements ICartService {
 
         // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng của user chưa
         Cart existingCart = cartRepository.findByUserAndProduct(user, product);
-
         if (existingCart != null) {
             // Nếu sản phẩm đã có trong giỏ hàng, cập nhật số lượng
             existingCart.setQuantity(existingCart.getQuantity() + cart.getQuantity());
@@ -57,6 +62,19 @@ public class CartService implements ICartService {
         }
     }
 
+    @Override
+    public List<Cart> searchCartWithComplexCriteria(
+            String categoryName, Integer quantity,
+            Integer min, Integer max, String keyword) {
+
+        Specification<Cart> spec = Specification
+                .where(CartSpecification.hasCategory(categoryName))
+                .and(CartSpecification.hasPriceInRange(min,max))
+                .and(CartSpecification.hasQuantityGreaterThan(quantity))
+                .and(CartSpecification.hasProductNameLike(keyword));
+        return cartRepository.findAll(spec);
+    }
+
     public List<CartResponseDto> getCartByUser(String username) {
         // Lấy thông tin user từ username (số điện thoại)
         User user = userRepository.findByPhoneNumber(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -66,10 +84,38 @@ public class CartService implements ICartService {
 
         // Chuyển đổi từ Cart entity sang DTO
         return carts.stream().map(cart -> new CartResponseDto(
+                cart.getId(),
                 cart.getProduct().getThumbnail(),
                 cart.getProduct().getName(),
                 cart.getQuantity(),
-                cart.getProduct().getPrice()
+                cart.getProduct().getPrice(),
+                this.modelMapper.map(cart.getUser(), UserRes.class)
         )).collect(Collectors.toList());
+    }
+
+    public List<CartResponseDto> getCartByUserAndListId(String username, List<Long> ids) {
+        // Lấy thông tin user từ username (số điện thoại)
+        User user = userRepository.findByPhoneNumber(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Lấy danh sách các sản phẩm trong giỏ hàng của user
+        List<Cart> carts = cartRepository.findByUser(user);
+
+        // Lọc các sản phẩm theo danh sách id được truyền vào
+        List<Cart> filteredCarts = carts.stream()
+                .filter(cart -> ids.contains(cart.getId()))
+                .toList();
+
+        // Chuyển đổi từ Cart entity sang DTO
+        return filteredCarts.stream()
+                .map(cart -> new CartResponseDto(
+                        cart.getId(),
+                        cart.getProduct().getThumbnail(),
+                        cart.getProduct().getName(),
+                        cart.getQuantity(),
+                        cart.getProduct().getPrice(),
+                        this.modelMapper.map(cart.getUser(), UserRes.class)
+                ))
+                .collect(Collectors.toList());
     }
 }

@@ -2,13 +2,13 @@ package com.example.shopapp.controller;
 
 import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.dtos.OrderDto;
+import com.example.shopapp.filters.JwtTokenFilter;
 import com.example.shopapp.model.Order;
+import com.example.shopapp.repositories.OrderRepository;
 import com.example.shopapp.services.IOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,23 +21,14 @@ import java.util.List;
 public class OrderController {
     private final IOrderService orderService;
     private final LocalizationUtils localizationUtils;
+    private final OrderRepository orderRepository;
 
-    @PostMapping("")
-    public ResponseEntity<?> createdOrder(@Valid @RequestBody OrderDto orderDto, BindingResult bindingResult) {
-        try {
-            if(bindingResult.hasErrors()) {
-                List<String> errorsMessage = bindingResult.getFieldErrors().stream()
-                        .map(FieldError::getDefaultMessage).toList();
-                return ResponseEntity.badRequest().body(errorsMessage);
-            }
-            Order orderResponse = orderService.createOrder(orderDto);
-            return ResponseEntity.ok(orderResponse);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/{ids}")
+    public ResponseEntity<?> createdOrder( @RequestBody OrderDto orderDto, @PathVariable("ids") List<Long> ids) {
+        return ResponseEntity.ok().body(orderService.createOrder(orderDto,ids));
     }
 
-    @GetMapping("/users/{user_id}") // Thêm biến đường dẫn user_id
+   /* @GetMapping("/users/{user_id}") // Thêm biến đường dẫn user_id
     //GET http://localhost:8088/api/v1/orders/user/4
     public ResponseEntity<?> getOrders(@Valid @PathVariable("user_id") Long userId) {
         try {
@@ -47,6 +38,13 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+*/
+    @GetMapping("/get-all-by-user")
+    public ResponseEntity<List<OrderDto>> getAllOrdersByUser() {
+        String user = JwtTokenFilter.CURRENT_USER;
+           return ResponseEntity.ok().body(orderService.getAllByUser(user)) ;
+    }
+
 
     @GetMapping("/{id}") // Lấy order theo id của order
     //GET http://localhost:8088/api/v1/orders/user/4
@@ -58,9 +56,6 @@ public class OrderController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-
-
 
     @PutMapping("/update/{id}")
     // Công việc của admin
@@ -81,5 +76,10 @@ public class OrderController {
     public ResponseEntity<?> deleteOrder(@PathVariable("id") Long id) {
         orderService.deleteOrder(id);
         return ResponseEntity.ok().body("deleted order successfully");
+    }
+
+    @GetMapping("get-by-user")
+    public ResponseEntity<List<Order>> getOrdersByUser() {
+        return ResponseEntity.ok().body(orderService.getAllOrders());
     }
 }

@@ -12,12 +12,15 @@ import com.example.shopapp.repositories.ProductImageRepository;
 import com.example.shopapp.repositories.ProductRepository;
 import com.example.shopapp.responses.ProductResponse;
 import com.example.shopapp.services.IProductService;
+import com.example.shopapp.specification.ProductSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -113,5 +116,15 @@ public class ProductService implements IProductService {
             throw new InvalidParamException("Number of images must be less than "+ProductImage.MAXIMUM_IMAGES_PER_PRODUCT)  ;
         }
         return productImageRepository.save(newProductImage);
+    }
+
+    @Override
+    public List<Product> searchProductByCriteria(String categoryName, Integer minPrice, Integer maxPrice,String name){
+        Specification<Product> spec = Specification
+                .where(ProductSpecification.hasCategory(categoryName))
+                .and(ProductSpecification.hasPriceInRange(minPrice, maxPrice))
+                .and(ProductSpecification.hasNamelike(name));
+        return productRepository.findAll(spec);
+
     }
 }

@@ -9,6 +9,7 @@ import com.example.shopapp.responses.ProductResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
 
 
 public interface IProductService {
@@ -24,7 +25,7 @@ public interface IProductService {
 
     boolean existsByName(String name);
 
-    public ProductImage createProductImage(
-            Long productId,
-            ProductImageDto productImageDto) throws Exception;
+    public ProductImage createProductImage(Long productId, ProductImageDto productImageDto) throws Exception;
+
+    List<Product> searchProductByCriteria(String categoryName, Integer minPrice, Integer maxPrice,String name);
 }
