@@ -15,7 +15,13 @@ import com.example.shopapp.services.impl.ProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +33,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -36,7 +47,7 @@ import java.util.List;
 @RequestMapping("${api.prefix}/products")
 @RequiredArgsConstructor
 @CrossOrigin("*")
-
+@Slf4j(topic = "Product")
 public class ProductController {
     protected final IProductService productService;
     private final LocalizationUtils localizationUtils;
@@ -44,69 +55,44 @@ public class ProductController {
     private final ProductImageRepository productImageRepository;
     private  final ProductService productServiceImpl;
 
-@ResponseBody
-    @RequestMapping(value = "/images/{imageName}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
+
+    @Value("${application.uploadFile}")
+    private String uploadDir;
+
+
+    @GetMapping("/images/{filename}")
+    public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
         try {
-            Path iagePath = Paths.get("D:/Project-BitiTraining/productfile/" + imageName);
-            UrlResource resource = new UrlResource(iagePath.toUri());
-            if(resource.exists()){
-                return ResponseEntity.ok()
-                        .contentType(MediaType.IMAGE_JPEG)
-                        .body(resource);
-            }else {
-                return ResponseEntity.notFound().build();
+            // Lấy đường dẫn ảnh từ thư mục uploadDir
+            Path imagePath = Paths.get("Project-BitiTraining/productfile").resolve(filename);
+            if (!Files.exists(imagePath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Không tìm thấy file
             }
-        }catch (Exception e){
-            return ResponseEntity.notFound().build();
+
+            // Trả về ảnh dưới dạng Resource
+            Resource resource = new UrlResource(imagePath.toUri());
+
+            // Kiểm tra định dạng file để trả về đúng content type
+            String contentType = Files.probeContentType(imagePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream";  // Kiểu mặc định nếu không xác định được
+            }
+
+            // Trả về đối tượng Resource và đặt loại nội dung phù hợp
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+
+        } catch (MalformedURLException e) {
+            // Xử lý lỗi nếu không thể tạo URL từ đường dẫn
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @ResponseBody
-    @RequestMapping(value = "/list-image/{productId}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> listImages(@PathVariable Long productId) {
-    try {
-        List<String> images = productImageRepository.findAllByProductId(productId);
-        List<String> fullLinkImages;
-        if (images.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            fullLinkImages = new ArrayList<>();
-            for (String image : images) {
-                fullLinkImages.add("http://localhost:8088/api/v1/products/images/" + image);
-            }
-        }
-        return ResponseEntity.ok().body(fullLinkImages);
-    }catch (Exception e){
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching images.");
-    }
-    }
 
-
-    @PostMapping("/add")
-    //POST http://localhost:8088/v1/api/products/image/251ef406-3cca-4ab6-8c10-cf45b738c2ec_3.jpg
-    public ResponseEntity<?> createProduct(
-             @RequestBody ProductDto productDto,
-            BindingResult result
-    ) {
-        try {
-            if(result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
-            Product newProduct = productService.createProduct(productDto);
-            return ResponseEntity.ok(newProduct);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 
     @PostMapping(value = "uploads/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    //POST http://localhost:8088/v1/api/products
     public ResponseEntity<?> uploadImages(
             @PathVariable("id") Long productId,
             @RequestParam("files") List<MultipartFile> files
@@ -150,6 +136,54 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+
+
+    @ResponseBody
+    @RequestMapping(value = "/list-image/{productId}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> listImages(@PathVariable Long productId) {
+    try {
+        List<String> images = productImageRepository.findAllByProductId(productId);
+        List<String> fullLinkImages;
+        if (images.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            fullLinkImages = new ArrayList<>();
+            for (String image : images) {
+                fullLinkImages.add("http://localhost:8080/api/v1/products/images/" + image);
+            }
+        }
+        return ResponseEntity.ok().body(fullLinkImages);
+    }catch (Exception e){
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while fetching images.");
+    }
+    }
+
+
+    @PostMapping("/add")
+    public ResponseEntity<?> createProduct(
+             @RequestBody ProductDto productDto,
+            BindingResult result
+    ) {
+        try {
+            if(result.hasErrors()) {
+                List<String> errorMessages = result.getFieldErrors()
+                        .stream()
+                        .map(FieldError::getDefaultMessage)
+                        .toList();
+                return ResponseEntity.badRequest().body(errorMessages);
+            }
+            Product newProduct = productService.createProduct(productDto);
+            return ResponseEntity.ok(newProduct);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
+
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getProduct(@PathVariable("id") Long id) {
         try {

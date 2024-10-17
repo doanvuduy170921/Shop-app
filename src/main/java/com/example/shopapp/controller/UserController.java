@@ -8,8 +8,10 @@ import com.example.shopapp.responses.LoginResponse;
 import com.example.shopapp.services.IUserService;
 import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.utils.MessageKeys;
+import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequestMapping("${api.prefix}/users")
 @RequiredArgsConstructor
 @CrossOrigin("*")
+@Slf4j(topic="USER")
 public class UserController {
 
 
@@ -32,6 +35,7 @@ public class UserController {
     public ResponseEntity<?> createdUser(@Valid @RequestBody UserDto userDto,
                                          BindingResult bindingResult) {
         try {
+            log.info("user create {}",userDto.toString());
             if (bindingResult.hasErrors()) {
                 List<String> errorsMessage = bindingResult.getFieldErrors().stream()
                         .map(FieldError::getDefaultMessage)
@@ -53,5 +57,7 @@ public class UserController {
             ) throws Exception {
        return this.userService.login(userLoginDto.getPhoneNumber(),userLoginDto.getPassword());
     }
+
+
 }
 

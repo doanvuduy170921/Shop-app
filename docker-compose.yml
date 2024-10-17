@@ -1,0 +1,42 @@
+version: '3'
+services:
+  mysql-container:
+    container_name: mysql-container
+    image: mysql:8.2.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: doanvuduy123
+      MYSQL_DATABASE: shopp_app_biti
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./src/main/resources/init.sql:/docker-entrypoint-initdb.d/init-script.sql
+
+  spring-app-container:
+    container_name: spring-app-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/shopp_app_biti
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: doanvuduy123
+      SERVER_PORT: 8080
+      UPLOAD_DIR: /app/productfile
+
+    volumes:
+      - D:\Project-BitiTraining\productfile:/app/productfile # map thư mục productfile từ máy host vào thư mục /app/productfile trong container
+
+
+  angular-app-container:
+    container_name: angular-app-container
+    build:
+      context: D:/Project-BitiTraining/ShopApp-Biti
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+

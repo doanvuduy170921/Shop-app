@@ -26,8 +26,8 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenUtils {
-    @Value("${application.uploadFile}")
-    private String uploadFile;
+
+
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
 
     // Generate token with given user name
@@ -36,7 +36,7 @@ public class JwtTokenUtils {
         return createToken(claims, userName);
     }
 
-    // Create a JWT token with specified claims and subject (user name)
+    // Create a JWT token with specified claims and subject
     private String createToken(Map<String, Object> claims, String userName) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -88,25 +88,32 @@ public class JwtTokenUtils {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    @Value("${application.uploadFile}")
+    private String uploadFile;
+
     public String storeFile(MultipartFile file) throws IOException {
         if(!isImageFile(file) || file.getOriginalFilename() == null){
             throw new IOException("Invalid image format");
         }
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        //Thêm UUID vào trước tên file để đảm bảo tên file là duy nhất
-        String uniqueFileName = UUID.randomUUID().toString()+"_"+fileName;
-        //Đường dẫn đến thư mục mà bạn muốn lưu file
+        String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
         java.nio.file.Path uploadDir = Paths.get(this.uploadFile);
-        //Kiểm tra và tạo thư mục nếu nó không tồn tại
-        if(!Files.exists(uploadDir)){
+
+        if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
-        // Đường dẫn đầy đủ đến tên file
-        java.nio.file.Path destination = Paths.get(uploadDir.toString(),uniqueFileName);
-        // Sao chép file vào thư mục chính
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+
+        java.nio.file.Path destination = uploadDir.resolve(uniqueFileName);
+        try {
+            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new IOException("Failed to store file", e);
+        }
+
         return uniqueFileName;
     }
+
     private boolean isImageFile(MultipartFile file) {
         String contentType = file.getContentType();
         return contentType != null && contentType.startsWith("image/");
