@@ -26,7 +26,7 @@ public class CartSpecification {
         });
     }
     // Lọc sản phẩm có giá từ minPrice đến maxPrice
-    public static Specification<Cart>hasPriceInRange(Integer min, Integer max) {
+    public static Specification<Cart> hasPriceInRange(Integer min, Integer max) {
         return ((root, query, criteriaBuilder) -> {
             Join<Object,Object> product = root.join("product");
             if(min!=null && max !=null){

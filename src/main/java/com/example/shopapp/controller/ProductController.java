@@ -60,35 +60,23 @@ public class ProductController {
     private String uploadDir;
 
 
-    @GetMapping("/images/{filename}")
-    public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
+    @ResponseBody
+    @RequestMapping(value = "/images/{imageName}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
-            // Lấy đường dẫn ảnh từ thư mục uploadDir
-            Path imagePath = Paths.get("Project-BitiTraining/productfile").resolve(filename);
-            if (!Files.exists(imagePath)) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Không tìm thấy file
+            Path iagePath = Paths.get("D:/Project-BitiTraining/productfile/" + imageName);
+            UrlResource resource = new UrlResource(iagePath.toUri());
+            if(resource.exists()){
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            }else {
+                return ResponseEntity.notFound().build();
             }
-
-            // Trả về ảnh dưới dạng Resource
-            Resource resource = new UrlResource(imagePath.toUri());
-
-            // Kiểm tra định dạng file để trả về đúng content type
-            String contentType = Files.probeContentType(imagePath);
-            if (contentType == null) {
-                contentType = "application/octet-stream";  // Kiểu mặc định nếu không xác định được
-            }
-
-            // Trả về đối tượng Resource và đặt loại nội dung phù hợp
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .body(resource);
-
-        } catch (MalformedURLException e) {
-            // Xử lý lỗi nếu không thể tạo URL từ đường dẫn
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }catch (Exception e){
+            return ResponseEntity.notFound().build();
         }
     }
-
 
 
     @PostMapping(value = "uploads/{id}",
@@ -150,7 +138,7 @@ public class ProductController {
         } else {
             fullLinkImages = new ArrayList<>();
             for (String image : images) {
-                fullLinkImages.add("http://localhost:8080/api/v1/products/images/" + image);
+                fullLinkImages.add("http://localhost:8088/api/v1/products/images/" + image);
             }
         }
         return ResponseEntity.ok().body(fullLinkImages);
@@ -272,7 +260,7 @@ public class ProductController {
             @RequestParam(required = false) Integer maxPrice,
             @RequestParam(required = false) String name){
 
-        return productService.searchProductByCriteria(categoryName,minPrice,maxPrice,name);
+            return productService.searchProductByCriteria(categoryName,minPrice,maxPrice,name);
     }
 }
 

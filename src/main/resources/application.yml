@@ -1,7 +1,7 @@
 server:
-  port: 8080
+  port: 8088
 application:
-  uploadFile: ${UPLOAD_DIR:/app/productfile}
+  uploadFile: /Project-BitiTraining/productfile
 spring:
   servlet:
     multipart:
@@ -9,9 +9,9 @@ spring:
       max-request-size: 10MB
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql-container:3306/shopp_app_biti}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:doanvuduy123}
+    url: jdbc:mysql://localhost:3306/shopp_app_biti
+    username: root
+    password: doanvuduy123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
